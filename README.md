@@ -5,18 +5,18 @@
 </p>
 
 <p align="center">
-  <img src="assets/logo.png" alt="bolo logo" width="120">
+  <img src="assets/logo.png" alt="bolo logo" width="180">
 </p>
 
 <h1 align="center">Bolo: Curated, Verified, and Ready-to-run Inference Pipelines for HuggingFace Models</h1>
 
-**bolo** is a lightweight Python library that gives you curated, verified, and ready-to-run inference pipelines for HuggingFace models — no environment juggling required.
+**Bolo** is a lightweight Python library that gives you curated, verified, and ready-to-run inference pipelines for HuggingFace models with ZERO efforts.
 
 📦 **Curated templates**: every supported model ships with a tested Jinja2 inference template maintained by the Illinois CreateLab team.
 
 🔒 **Isolated venvs**: each model runs inside its own `uv`-managed virtual environment, so dependency conflicts between models are impossible.
 
-⚡ **One-call API**: `bolo.pipeline(repo_id, device="cuda", ...)` fetches templates, spins up the venv, and returns results — all in one call.
+⚡ **One-call API**: `bolo.pipeline(repo_id, device="cuda", ...)` conducts inference in one API call, simpler than HuggingFace two-stages `pipeline` API.
 
 🖥️ **CLI included**: a `bolo` command lets you manage venvs and run inference directly from the shell.
 
@@ -35,22 +35,22 @@ Run inference with two lines of Python:
 ```python
 import bolo
 
-result = bolo.pipeline("distilbert/distilbert-base-uncased-finetuned-sst-2-english", device="cuda")
+result = bolo.pipeline("<REPO_ID>", device="cuda:0")
 print(result)
 ```
 
 Before running inference you can inspect what parameters the template accepts:
 
 ```python
-bolo.list_params("distilbert/distilbert-base-uncased-finetuned-sst-2-english")
+bolo.list_params("<REPO_ID>")
 ```
 
-Or manage venvs explicitly if you want finer control:
+And manage venvs explicitly:
 
 ```python
-python_bin = bolo.create_a_venv("distilbert/distilbert-base-uncased-finetuned-sst-2-english")
-# ... run inference ...
-bolo.remove_venv("distilbert/distilbert-base-uncased-finetuned-sst-2-english")
+python_bin = bolo.create_a_venv("<REPO_ID>")
+# ... activate the created venv and do inference ...
+bolo.remove_venv("<REPO_ID>")
 ```
 
 ## CLI
@@ -59,18 +59,14 @@ The `bolo` command mirrors the Python API from your shell.
 
 **Create an isolated venv for a model:**
 ```bash
-bolo create-venv distilbert/distilbert-base-uncased-finetuned-sst-2-english
-bolo create-venv distilbert/distilbert-base-uncased-finetuned-sst-2-english --venv-path /path/to/venv
+bolo create-venv <REPO_ID>
+bolo create-venv <REPO_ID> --venv-path /path/to/venv
+# then activate the venv
 ```
 
 **Run inference:**
 ```bash
-bolo run distilbert/distilbert-base-uncased-finetuned-sst-2-english device=cuda
-```
-
-**Remove a model's venv:**
-```bash
-bolo remove-venv distilbert/distilbert-base-uncased-finetuned-sst-2-english
+bolo run <REPO_ID> device=cuda:0
 ```
 
 **Pre-download the templates cache (optional, useful on air-gapped machines):**
@@ -101,8 +97,8 @@ flowchart LR
 ## Install from source
 
 ```bash
-git clone https://github.com/illinoisdata/bolo.git
-cd bolo
+git clone https://github.com/illinoisdata/Bolo.git
+cd Bolo
 pip install -e .
 ```
 
