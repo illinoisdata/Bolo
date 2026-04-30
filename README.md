@@ -110,6 +110,9 @@ Set `BOLO_TEMPLATES_DIR` to point bolo at your own templates folder:
 export BOLO_TEMPLATES_DIR=/path/to/my/templates
 ```
 
+## Platforms
+`bolo` is developed and tested on Red Hat Enterprise Linux, with CUDA version 12.8. So all dependencies (`torch`-related) assume the `cu128`.
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or pull request on [GitHub](https://github.com/illinoisdata/bolo/issues).

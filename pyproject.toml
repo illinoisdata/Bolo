@@ -50,9 +50,9 @@ dev = [
 bolo = "bolo.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/illinoisdata/bolo"
-Repository = "https://github.com/illinoisdata/bolo"
-Issues = "https://github.com/illinoisdata/bolo/issues"
+Homepage = "https://github.com/illinoisdata/Bolo"
+Repository = "https://github.com/illinoisdata/Bolo"
+Issues = "https://github.com/illinoisdata/Bolo/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
