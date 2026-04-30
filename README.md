@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://github.com/illinoisdata/bolo/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/illinoisdata/bolo.svg?color=blue"></a>
-    <a href="https://github.com/illinoisdata/bolo-templates/releases"><img alt="bolo-templates release" src="https://img.shields.io/github/release/illinoisdata/bolo-templates.svg?label=templates"></a>
+    <a href="https://github.com/illinoisdata/bolo-templates/releases/tag/v0.1.0"><img alt="bolo-templates release" src="https://img.shields.io/github/release/illinoisdata/bolo-templates.svg?label=templates"></a>
     <a href="https://pypi.org/project/bolo"><img alt="PyPI" src="https://img.shields.io/pypi/v/bolo.svg"></a>
 </p>
 
