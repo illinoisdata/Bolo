@@ -4,12 +4,11 @@
     <a href="https://pypi.org/project/bolo"><img alt="PyPI" src="https://img.shields.io/pypi/v/bolo.svg"></a>
 </p>
 
-<h1 align="center">
-  <div style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;">
-    <img src="assets/logo.png" alt="bolo logo" width=120px>
-    <span>Bolo: Curated, Verified, and Ready-to-run Inference Pipelines for HuggingFace Models</span>
-  </div>
-</h1>
+<p align="center">
+  <img src="assets/logo.png" alt="bolo logo" width="120">
+</p>
+
+<h1 align="center">Bolo: Curated, Verified, and Ready-to-run Inference Pipelines for HuggingFace Models</h1>
 
 **bolo** is a lightweight Python library that gives you curated, verified, and ready-to-run inference pipelines for HuggingFace models — no environment juggling required.
 
