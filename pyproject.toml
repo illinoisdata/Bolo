@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bolo"
+version = "0.1.0"
+description = "A lightweight library of verified inference pipelines for HuggingFace models."
+readme = "README.md"
+requires-python = ">=3.13"
+license = "MIT"
+authors = [
+  { name = "Illinois CreateLab" }
+]
+keywords = [
+  "huggingface",
+  "inference",
+  "pipeline",
+  "verified",
+  "curated",
+  "model-registry",
+  "llm-agents"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Typing :: Typed"
+]
+dependencies = [
+  "jinja2>=3.0"
+]
+
+[project.optional-dependencies]
+hf = [
+  "transformers>=4.40",
+  "torch>=2.0"
+]
+dev = [
+  "build>=1.2",
+  "pytest>=8.0",
+  "twine>=5.0",
+  "ruff>=0.6"
+]
+
+[project.scripts]
+bolo = "bolo.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/illinoisdata/bolo"
+Repository = "https://github.com/illinoisdata/bolo"
+Issues = "https://github.com/illinoisdata/bolo/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+bolo = ["py.typed"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
