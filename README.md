@@ -1,7 +1,7 @@
 <p align="center">
     <a href="https://github.com/illinoisdata/bolo/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/illinoisdata/bolo.svg?color=blue"></a>
     <a href="https://github.com/illinoisdata/bolo-templates/releases"><img alt="bolo-templates release" src="https://img.shields.io/github/v/release/illinoisdata/bolo-templates?include_prereleases&label=templates"></a>
-    <a href="https://pypi.org/project/bolo"><img alt="PyPI" src="https://img.shields.io/pypi/v/bolo.svg"></a>
+    <a href="https://pypi.org/project/pybolo"><img alt="PyPI" src="https://img.shields.io/pypi/v/pybolo.svg"></a>
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 Install bolo:
 
 ```bash
-pip install bolo
+pip install pybolo
 ```
 
 Run inference with two lines of Python:
