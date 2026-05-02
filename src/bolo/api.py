@@ -45,22 +45,18 @@ class InferClient:
     def _ensure_templates() -> Path:
         env_path = os.environ.get("BOLO_TEMPLATES_DIR")
         if env_path:
-            return Path(env_path).expanduser()
+            target = Path(env_path).expanduser()
+        else:
+            target = Path.home() / ".cache" / "bolo" / "templates" / __templates_version__
 
-        local = Path(__file__).parent / "templates"
-        if local.exists() and any(local.iterdir()):
-            return local
-
-        cache_root = Path.home() / ".cache" / "bolo" / "templates"
-        cache = cache_root / __templates_version__
-        if cache.exists() and any(cache.iterdir()):
-            return cache
+        if target.exists() and any(target.iterdir()):
+            return target
 
         url = _TEMPLATES_RELEASE_URL.format(version=__templates_version__)
         print(f"fetching bolo templates v{__templates_version__} from {url} ...", flush=True)
 
-        cache_root.mkdir(parents=True, exist_ok=True)
-        tmp = cache_root / f".tmp.{__templates_version__}"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        tmp = target.parent / f".tmp.{target.name}"
         if tmp.exists():
             shutil.rmtree(tmp)
         tmp.mkdir()
@@ -68,12 +64,16 @@ class InferClient:
         try:
             with urllib.request.urlopen(url) as resp, tarfile.open(fileobj=resp, mode="r|gz") as tar:
                 tar.extractall(tmp)
-            tmp.rename(cache)
+            extracted = tmp / "templates"
+            src = extracted if extracted.exists() else tmp
+            src.rename(target)
         except Exception:
             shutil.rmtree(tmp, ignore_errors=True)
             raise
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
-        return cache
+        return target
 
     @staticmethod
     def _bolo_install_args() -> list[str]:
@@ -139,14 +139,31 @@ class InferClient:
             venv_path = self.db_dir / "tmp_venv" / repo_name
         shutil.rmtree(venv_path, ignore_errors=True)
             
+    _HARDCODED_DATA_PREFIX = "/u/yli77/projects/ML-code-generation/data"
+    _KNOWN_OTHER_HARDCODED_PREFIX = [
+        (
+            "/u/yli77/work_link/yli77/templates/milestone1/transformers/others/_mini-swe",
+            lambda tp: str(tp.parent),
+        )
+    ]
+
+    def _replace_hardcoded_paths(self, template: str, template_path: Path) -> str:
+        demo_data_dir = (template_path.parent.parent / "_demo_data").resolve()
+        template = template.replace(self._HARDCODED_DATA_PREFIX, str(demo_data_dir))
+        for prefix, replacement in self._KNOWN_OTHER_HARDCODED_PREFIX:
+            template = template.replace(prefix, replacement(template_path))
+        return template
+
     def render_template(self, repo_id: str, params: dict):
         rid_name = "__SEP__".join(repo_id.split('/'))
         template_path = self.db_dir / rid_name / "template.j2"
-        
+
         params["repo_id"] = repo_id
-        
+
         with open(template_path, 'r', encoding="utf-8") as f:
             template = f.read().strip()
+
+        template = self._replace_hardcoded_paths(template, template_path)
             
         try:
             rendered_script = Environment(undefined=StrictUndefined).from_string(template).render(**params)
@@ -163,7 +180,9 @@ class InferClient:
         
         with open(template_path, 'r', encoding="utf-8") as f:
             template = f.read().strip()
-        
+
+        template = self._replace_hardcoded_paths(template, template_path)
+
         set_pattern = re.compile(r'^\s*\{\%\s*set\s+([a-zA-Z_]\w*)\s*=\s*(.*?)\s*\%\}\s*$')
         lines = template.splitlines()
         params = []
@@ -189,7 +208,7 @@ class InferClient:
                     except Exception:
                         default = raw_default
                 
-                if name == "repo_id" or name == "output_dir":
+                if name == "repo_id":
                     continue
                 
                 params.append(
@@ -205,14 +224,6 @@ class InferClient:
             if started:
                 break
         
-        if not any(p["name"] == "device" for p in params):
-            params.insert(0, {
-                "name": "device",
-                "default": "<required>",
-                "type": "str",
-                "raw_default": "<required>",
-            })
-
         result = {
             "num_params": len(params),
             "params": params,
