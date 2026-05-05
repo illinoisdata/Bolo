@@ -12,6 +12,13 @@
 
 **Bolo** is a lightweight Python library that gives you curated, verified, and ready-to-run inference pipelines for HuggingFace models with ZERO efforts.
 
+## Development
+
+- Each issue must be labeled with `TODO` or `bug`.
+- Each issue will only be closed when PyPI is updated.
+- For `bug` issue, please refer to `tracker` issue for progress.
+- For `TODO` issue, please refer to [Notion sprint](https://www.notion.so/350816f2148580dc89aad89e9b884921?v=350816f2148580529116000cd3171838&source=copy_link) for progress (each `TODO` issue contains the specific sprint page).
+
 📦 **Curated templates**: every supported model ships with a tested Jinja2 inference template maintained by the Illinois CreateLab team.
 
 🔒 **Isolated venvs**: each model runs inside its own `uv`-managed virtual environment, so dependency conflicts between models are impossible.
