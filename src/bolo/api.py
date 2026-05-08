@@ -89,6 +89,7 @@ class InferClient:
             venv_path = self.db_dir / "tmp_venv" / repo_name
             print(f"you do not specify the venv path for {repo_id}, we create by default at {venv_path}")
         
+        venv_path = Path(venv_path)
         if venv_path.exists():
             print(f"ven for {repo_id} has been already existed")
             return venv_path / "bin" / "python", True
