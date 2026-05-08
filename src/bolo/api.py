@@ -74,14 +74,6 @@ class InferClient:
             shutil.rmtree(tmp, ignore_errors=True)
 
         return target
-
-    @staticmethod
-    def _bolo_install_args() -> list[str]:
-        """Args to pass to `uv pip install` when seeding bolo into a model venv."""
-        project_root = Path(__file__).resolve().parent.parent.parent
-        if (project_root / "pyproject.toml").exists():
-            return ["-e", str(project_root)]
-        return ["bolo"]
             
     def query_a_repo(self, repo_id: str):
         if repo_id not in self.supported_models:
@@ -119,14 +111,6 @@ class InferClient:
             subprocess.run(cmd2, check=True, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:
             print(f"failed to install requirements.txt for {repo_id}, due to the following error : ")
-            print(e.stderr)
-            return "", False
-
-        cmd3 = ['uv', 'pip', 'install', *self._bolo_install_args(), '--python', str(python_bin)]
-        try:
-            subprocess.run(cmd3, check=True, text=True, capture_output=True)
-        except subprocess.CalledProcessError as e:
-            print(f"failed to install bolo into the venv for {repo_id}, due to the following error : ")
             print(e.stderr)
             return "", False
 
