@@ -60,8 +60,10 @@ bolo does not install model dependencies for you. Each model's template folder c
 bolo fetch-templates   # prints the templates directory
 uv venv .venv-<MODEL> --python 3.13 && source .venv-<MODEL>/bin/activate
 uv pip install -r ~/.cache/bolo/templates/<TEMPLATES_VERSION>/<ORG>__SEP__<NAME>/requirements.txt \
-    --extra-index-url https://download.pytorch.org/whl/cu128
+    --extra-index-url https://download.pytorch.org/whl/cu128 --index-strategy unsafe-best-match
 ```
+
+`--index-strategy unsafe-best-match` is required because the PyTorch index also hosts common packages (e.g. `certifi`) at versions other than the pinned ones. If the model's `requirements.txt` pins no `+cu128` wheels (e.g. `torch==2.13.0` rather than `torch==2.11.0+cu128`), drop both flags and install from PyPI only; otherwise PyTorch packages built for different CUDA versions can get mixed.
 
 The folder name is the repo id with `/` replaced by `__SEP__`, e.g. `BeIR/query-gen-msmarco-t5-base-v1` → `BeIR__SEP__query-gen-msmarco-t5-base-v1`.
 

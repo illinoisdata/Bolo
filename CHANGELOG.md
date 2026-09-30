@@ -13,3 +13,20 @@
 
 1. Bug mentioned in #4 (on v0.1.0 bug tracker #2).
 2. TODO mentioned in #5 (on Notion sprint). We should discuss further on whether we need to strictly set the `transformers` as v5.3.0.
+
+## v0.1.2
+
+### Bugs
+
+1. Fix the bug mentioned in #7, we actually stripe the dependencies installation from API & CLI.
+2. Fix the bug mentioned in #4, which doesn't matter.
+3. The #5 is now deprecated, we use `--no-deps` in `pip install` command. 
+4. The #6 is also closed, since we now require users to firstly install `pybolo`.
+
+### TODOs
+
+TBD
+
+### Left
+
+TBD
