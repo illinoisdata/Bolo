@@ -21,11 +21,11 @@
 
 📦 **Curated templates**: every supported model ships with a tested Jinja2 inference template maintained by the Illinois CreateLab team.
 
-🔒 **Isolated venvs**: each model runs inside its own `uv`-managed virtual environment, so dependency conflicts between models are impossible.
+📌 **Pinned requirements**: every model ships with a `requirements.txt` listing its exact dependencies, so you can set up a working environment for it yourself.
 
 ⚡ **One-call API**: `bolo.pipeline(repo_id, device="cuda", ...)` conducts inference in one API call, simpler than HuggingFace two-stages `pipeline` API.
 
-🖥️ **CLI included**: a `bolo` command lets you manage venvs and run inference directly from the shell.
+🖥️ **CLI included**: a `bolo` command lets you fetch templates and run inference directly from the shell.
 
 🌐 **Auto-fetching templates**: template bundles are downloaded on first use from the [bolo-templates](https://github.com/illinoisdata/bolo-templates) GitHub release and cached locally — no manual setup needed.
 
@@ -37,7 +37,7 @@ Install bolo:
 pip install pybolo
 ```
 
-Run inference with two lines of Python:
+Install the model's dependencies (see [Installing model dependencies](#installing-model-dependencies)), then run inference with two lines of Python:
 
 ```python
 import bolo
@@ -52,26 +52,24 @@ Before running inference you can inspect what parameters the template accepts:
 bolo.list_params("<REPO_ID>")
 ```
 
-And manage venvs explicitly:
+## Installing model dependencies
 
-```python
-python_bin = bolo.create_a_venv("<REPO_ID>")
-# ... activate the created venv and do inference ...
-bolo.remove_venv("<REPO_ID>")
+bolo does not install model dependencies for you. Each model's template folder contains a `requirements.txt`; install it into the environment you run bolo from (we recommend one venv per model, since models may pin conflicting versions):
+
+```bash
+bolo fetch-templates   # prints the templates directory
+uv venv .venv-<MODEL> --python 3.13 && source .venv-<MODEL>/bin/activate
+uv pip install -r ~/.cache/bolo/templates/<TEMPLATES_VERSION>/<ORG>__SEP__<NAME>/requirements.txt \
+    --extra-index-url https://download.pytorch.org/whl/cu128
 ```
+
+The folder name is the repo id with `/` replaced by `__SEP__`, e.g. `BeIR/query-gen-msmarco-t5-base-v1` → `BeIR__SEP__query-gen-msmarco-t5-base-v1`.
 
 ## CLI
 
 The `bolo` command mirrors the Python API from your shell.
 
-**Create an isolated venv for a model:**
-```bash
-bolo create-venv <REPO_ID>
-bolo create-venv <REPO_ID> --venv-path /path/to/venv
-# then activate the venv
-```
-
-**Run inference:**
+**Run inference** (in an environment with the model's dependencies installed):
 ```bash
 bolo run <REPO_ID> device=cuda:0
 ```
@@ -83,19 +81,19 @@ bolo fetch-templates
 
 ## How does bolo work?
 
-bolo separates *what to run* (the Jinja2 template) from *where to run it* (the model's isolated venv).
+bolo separates *what to run* (the Jinja2 template) from *where to run it* (the environment you set up from the model's `requirements.txt`).
 
 ```mermaid
 flowchart LR
     A[User calls bolo.pipeline] --> B[Fetch / load templates]
     B --> C[Render Jinja2 template\nwith user params]
-    C --> D[Execute rendered script\ninside model venv]
+    C --> D[Execute rendered script\nin the current environment]
     D --> E[Return RESULT]
 ```
 
 1. **Templates** — stored in the [bolo-templates](https://github.com/illinoisdata/bolo-templates) release bundle. Each model folder contains a `template.j2` (the inference script template) and a `requirements.txt` (the model's exact dependencies). Templates are downloaded once and cached at `~/.cache/bolo/templates/`.
 
-2. **Venvs** — created with `uv venv` + `uv pip install -r requirements.txt`. Every model gets its own venv so you can safely use models with conflicting PyTorch or CUDA versions side-by-side.
+2. **Dependencies** — installed by you from the model's `requirements.txt` (see [Installing model dependencies](#installing-model-dependencies)). Using one venv per model lets you run models with conflicting PyTorch or CUDA versions side-by-side.
 
 3. **Rendering** — template parameters are collected from the leading `{% set key = default %}` blocks in each `template.j2`. `bolo list_params` shows you every knob with its type and default value.
 

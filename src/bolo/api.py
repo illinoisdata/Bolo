@@ -3,7 +3,6 @@ import re
 import ast
 import json
 import shutil
-import subprocess
 import tarfile
 import urllib.request
 from pathlib import Path
@@ -19,7 +18,6 @@ _TEMPLATES_RELEASE_URL = (
 
 class InferClient:
     _instance = None
-    _torch_cu128_url = "https://download.pytorch.org/whl/cu128"
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -82,49 +80,10 @@ class InferClient:
         
         return True
     
-    def create_venv(self, repo_id: str, venv_path: str | Path | None = None):
-        repo_name = "__SEP__".join(repo_id.split('/'))
-        
-        if not venv_path:
-            venv_path = self.db_dir / "tmp_venv" / repo_name
-            print(f"you do not specify the venv path for {repo_id}, we create by default at {venv_path}")
-        
-        venv_path = Path(venv_path)
-        if venv_path.exists():
-            print(f"ven for {repo_id} has been already existed")
-            return venv_path / "bin" / "python", True
-        
-        os.makedirs(venv_path, exist_ok=True)
-        
-        req_txt = self.db_dir / repo_name / "requirements.txt"
-        
-        cmd1 = ['uv', 'venv', str(venv_path), '--python', '3.13']
-        try:
-            subprocess.run(cmd1, check=True, text=True, capture_output=True)
-        except Exception as e:
-            print(f"failed to create uv venv for {repo_id}, due to the following error : ")
-            print(e.stderr)
-            return "", False
-        
-        python_bin = venv_path / "bin" / "python"
-        cmd2 = ['uv', 'pip', 'install', '-r', str(req_txt), '--python', str(python_bin), '--extra-index-url', self._torch_cu128_url]
-        try:
-            subprocess.run(cmd2, check=True, text=True, capture_output=True)
-        except subprocess.CalledProcessError as e:
-            print(f"failed to install requirements.txt for {repo_id}, due to the following error : ")
-            print(e.stderr)
-            return "", False
-
-        print(f"installed requirements.txt and bolo in a venv : {python_bin}!")
-        return python_bin, True
-    
-    def remove_venv(self, repo_id: str, venv_path: str | Path | None = None):
-        repo_name = "__SEP__".join(repo_id.split('/'))
-        if not venv_path:
-            venv_path = self.db_dir / "tmp_venv" / repo_name
-        shutil.rmtree(venv_path, ignore_errors=True)
-            
-    _HARDCODED_DATA_PREFIX = "/u/yli77/projects/ML-code-generation/data"
+    _HARDCODED_DATA_PREFIXES = (
+        "/u/yli77/projects/ML-code-generation/data",
+        "/u/yunqili4/projects/ML-code-generation/data",
+    )
     _KNOWN_OTHER_HARDCODED_PREFIX = [
         (
             "/u/yli77/work_link/yli77/templates/milestone1/transformers/others/_mini-swe",
@@ -134,7 +93,8 @@ class InferClient:
 
     def _replace_hardcoded_paths(self, template: str, template_path: Path) -> str:
         demo_data_dir = (template_path.parent.parent / "_demo_data").resolve()
-        template = template.replace(self._HARDCODED_DATA_PREFIX, str(demo_data_dir))
+        for prefix in self._HARDCODED_DATA_PREFIXES:
+            template = template.replace(prefix, str(demo_data_dir))
         for prefix, replacement in self._KNOWN_OTHER_HARDCODED_PREFIX:
             template = template.replace(prefix, replacement(template_path))
         return template
@@ -266,25 +226,6 @@ def list_params(repo_id: str):
     _ = client.list_params(repo_id)
         
         
-def create_a_venv(repo_id: str, venv_path: str | Path | None = None):
-    client = InferClient()
-    
-    is_exist = client.query_a_repo(repo_id)
-    if not is_exist:
-        raise ValueError(f"bolo does not support {repo_id}")
-    
-    if venv_path is not None and os.path.exists(venv_path):
-        print(f"already created venv at : {venv_path}")
-        return venv_path
-    
-    venv_path, staus = client.create_venv(repo_id, venv_path)
-    
-    if not staus:
-        raise RuntimeError(f"failed to create venv for {repo_id}")
-    
-    return venv_path
-    
-    
 def pipeline(repo_id: str, **kwargs):
     client = InferClient()
     
@@ -301,11 +242,6 @@ def pipeline(repo_id: str, **kwargs):
     return client.run_inference(code)
     
     
-def remove_venv(repo_id: str):
-    client = InferClient()
-    client.remove_venv(repo_id)
-
-
 def fetch_templates() -> Path:
     """Pre-populate the bolo templates cache (downloads from the GitHub release if needed)."""
     path = InferClient._ensure_templates()
